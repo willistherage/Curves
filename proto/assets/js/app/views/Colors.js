@@ -6,7 +6,7 @@ var Colors = function()
     	// VARIABLES
     	//----------------------------------------
 
-        colors: [],
+        list: [],
         colorList: [],
     	colorIndex: 0,
 
@@ -29,19 +29,33 @@ var Colors = function()
                 [0xe71f37, 0xf274a0, 0xe64398, 0xad2e95, 0x1f3463, 0xe64398, 0xe71f37, 0x1f3463, 0xad2e95]
             ];
 
+            var defaultColors = this.colorList[0];
             
+            this.list = [];
+
+            for(var i = 0; i < defaultColors.length; i++)
+            {
+                this.list.push(new Color(defaultColors[i]));
+            }
     	},
 
         shift: function(index)
         {
             this.colorIndex = index;
-            this.targetColors = this.colors[this.colorIndex];
+            
+            for(var i = 0; i < this.list.length; i++)
+            {
+                this.list[i].shift(this.colorList[i]);
+            }
 
         },
 
     	update: function(delta) 
     	{
-	        
+	        for(var i = 0; i < this.list.length; i++)
+            {
+                this.list[i].update(delta);
+            }
     	}
 
 	};
