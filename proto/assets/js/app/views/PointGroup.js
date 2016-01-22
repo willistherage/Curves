@@ -14,11 +14,11 @@ var PointGroup = function()
     	percentageX: 0,
     	percentageY: 0,
     	
-    	// The incremental value that determines the oscelation of the points.
-    	oscelatorX: 0,
-    	oscelatorY: 0,
+    	// The incremental value that determines the oscillation of the points.
+    	oscillatorX: 0,
+    	oscillatorY: 0,
     	
-    	// The amount the oscelation increments.
+    	// The amount the oscillation increments.
     	incrementX: 1,
     	incrementY: 1,
     	
@@ -54,8 +54,8 @@ var PointGroup = function()
     		var length = this.points.length;
 
     		// The base location of the group
-    		var baseX = this.width * this.centerX;
-    		var baseY = this.height * this.centerY;
+    		var baseX = this.width * this.originX;
+    		var baseY = this.height * this.originY;
 
     		// The distance the group will spread
 	        var spreadX = this.width * this.percentageX;
@@ -65,22 +65,19 @@ var PointGroup = function()
 	        var spaceX = spreadX / (length - 1);
 	        var spaceY = spreadY / (length - 1);
 
-	        // Incrementing the oscelation value.
-	        this.oscelatorX += this.incrementX;
-	        this.oscelatorY += this.incrementY;
-	        
-	        // Getting a value from -1 to 1 based on the oscelation value.
-	        var oscelationX = Math.cos(this.oscelatorX * MathUtils.DEGREES_TO_RADIANS);
-	        var oscelationY = Math.cos(this.oscelatorY * MathUtils.DEGREES_TO_RADIANS);
+            // Get the starting point of the point distribution
+            var startX = baseX - spreadX * this.centerX;
+            var startY = baseY - spreadY * this.centerY;
 
 	        var point;
 
 	        for(var i = 0; i < length; i++)
 	        {
 	        	point = this.points[i];
-	            point.x = 0;
-	            point.y = 0;
-	            //this.graphics.drawCircle(dotX, startY + dotYSpace * i + oscelation * this.range, this.dotSize);
+                point.oscillateX += point.incrementX;
+                point.oscillateY += point.incrementY;
+	            point.x = startX + spaceX * i + Math.cos(point.oscillateX * MathUtils.DEGREES_TO_RADIANS) * this.rangeX;
+	            point.y = startY + spaceY * i + Math.cos(point.oscillateY * MathUtils.DEGREES_TO_RADIANS) * this.rangeY;
 	        }
 	        
     	}

@@ -10,7 +10,7 @@ var CurveAppView = BaseView.extend({
     renderer: null,
     graphics: null,
     curves:null,
-    resolution: 2,
+    resolution: 1,
     defaultWidth: 800,
     defaultHeight: 600,
 

@@ -30,12 +30,15 @@ var Curve = BaseView.extend({
         this.winHeight = this.options.height;
         this.dotSize = this.options.dotSize;
         
+        var point;
+
         for(var i = 0; i < this.pointCount; i++)
         {
-            this.points.push(new Point());
+            point = new Point();
+            point.incrementY = 0.5 + Math.random() * 1;
+            point.oscillateY = Math.round(Math.random() * 360);
+            this.points.push(point);
         }
-
-        this.addListeners();
 	},
 
     render: function()
@@ -48,7 +51,7 @@ var Curve = BaseView.extend({
         {
             point = this.points[i];
 
-            this.graphics.drawCircle(point.x, this, this.dotSize);
+            this.graphics.drawCircle(point.x, point.y, this.dotSize);
         }
         
     }

@@ -66,7 +66,7 @@ var Curves = BaseView.extend({
             group = new PointGroup();
             group.width = this.winWidth;
             group.height = this.winHeight;
-            group.
+            group.originX = p / (this.pointCount-1);
             group.init();
 
             for(var c = 0; c < this.curveCount; c++)
@@ -79,43 +79,43 @@ var Curves = BaseView.extend({
 
         // Group 1
         group = this.groups[0];
-        group.rangeY = 20;
-        group.percentageY = 0.4;
-        group.originY = 0.5;
-        group.centerY = 0.5;
+        group.rangeY = 10;
+        group.percentageY = 0.3;
+        group.originY = 0.75;
+        group.centerY = 1;
         
         // Group 2
         group = this.groups[1];
-        group.rangeY = 20;
-        group.percentageY = 0.4;
+        group.rangeY = 15;
+        group.percentageY = 0.5;
         group.originY = 0.5;
         group.centerY = 0.5;
 
          // Group 3
         group = this.groups[2];
-        group.rangeY = 20;
-        group.percentageY = 0.4;
+        group.rangeY = 5;
+        group.percentageY = 0.3;
         group.originY = 0.5;
         group.centerY = 0.5;
 
          // Group 4
         group = this.groups[3];
-        group.rangeY = 20;
-        group.percentageY = 0.4;
+        group.rangeY = 30;
+        group.percentageY = 0.8;
         group.originY = 0.5;
         group.centerY = 0.5;
 
          // Group 5
         group = this.groups[4];
-        group.rangeY = 20;
-        group.percentageY = 0.4;
+        group.rangeY = 15;
+        group.percentageY = 0.6;
         group.originY = 0.5;
         group.centerY = 0.5;
 
          // Group 6
         group = this.groups[5];
         group.rangeY = 20;
-        group.percentageY = 0.4;
+        group.percentageY = 0.5;
         group.originY = 0.5;
         group.centerY = 0.5;
 
@@ -143,7 +143,7 @@ var Curves = BaseView.extend({
             this.groups[p].width = width;
             this.groups[p].height = height;
         }
-    }
+    },
 
     //----------------------------------------
     // PRIVATE METHODS
@@ -165,14 +165,15 @@ var Curves = BaseView.extend({
 
     onUpdate: function() {
 
-        if(!this.graphics)
+        if(!this.graphics || !this.groups || !this.curves)
             return;
 
         this.graphics.clear();
 
-        for(var p = 0; p < this.pointGroups.length; p++)
+
+        for(var p = 0; p < this.groups.length; p++)
         {
-            this.pointGroups[p].update();
+            this.groups[p].update();
         }
 
         for(var i = 0; i < this.curves.length; i++)
