@@ -10,6 +10,8 @@ var Curves = BaseView.extend({
     pointCount: 6,
     curves:[],
     groups: [],
+    mouseX: 0,
+    mouseY: 0,
 
     //
     progress: 0,
@@ -24,7 +26,7 @@ var Curves = BaseView.extend({
 		
         this.bind();
 
-		_.bindAll(this, 'init', 'addListeners', 'removeListeners', 'onUpdate');
+		_.bindAll(this, 'init', 'addListeners', 'removeListeners', 'onMouseMove', 'onUpdate');
 
         this.addListeners();
 
@@ -78,23 +80,23 @@ var Curves = BaseView.extend({
 
         // Group 1
         group = this.groups[0];
-        group.rangeY = 10;
-        group.percentageY = 0.3;
-        group.originY = 0.75;
+        group.rangeY = 4;
+        group.percentageY = 0.2;
+        group.originY = 1.2;
         group.centerY = 1;
         
         // Group 2
         group = this.groups[1];
         group.rangeY = 15;
-        group.percentageY = 0.5;
-        group.originY = 0.5;
-        group.centerY = 0.5;
+        group.percentageY = 0.65;
+        group.originY = 1;
+        group.centerY = 0.75;
 
          // Group 3
         group = this.groups[2];
         group.rangeY = 5;
-        group.percentageY = 0.3;
-        group.originY = 0.5;
+        group.percentageY = 0.45;
+        group.originY = 0.65;
         group.centerY = 0.5;
 
          // Group 4
@@ -115,7 +117,7 @@ var Curves = BaseView.extend({
         group = this.groups[5];
         group.rangeY = 20;
         group.percentageY = 0.5;
-        group.originY = 0.5;
+        group.originY = 0.6;
         group.centerY = 0.5;
 
 	},
@@ -153,37 +155,52 @@ var Curves = BaseView.extend({
     addListeners: function()
     {
         AnimationFrame.addListener(this.onUpdate);
+
+        window.addEventListener('mousemove', this.onMouseMove);
     },
 
     removeListeners: function()
     {
         AnimationFrame.removeListener(this.onUpdate);
+
+        window.removeEventListener('mousemove', this.onMouseMove);
     },
 
     //----------------------------------------
     // EVENT HANDLERS
     //----------------------------------------
 
-    onUpdate: function() {
+    onMouseMove: function(event)
+    {
+        this.mouseX = event.clientX;
+        this.mouseY = event.clientY;
+    },
 
+    onUpdate: function(delta, time)
+    {
         if(!this.graphics || !this.groups || !this.curves)
             return;
 
         this.graphics.clear();
 
-
         this.graphics.beginFill(this.colors[0], 1);
         this.graphics.drawRect(0, 0, this.winWidth, this.winHeight);
         this.graphics.endFill();
 
+        var group, curve;
+
         for(var p = 0; p < this.groups.length; p++)
         {
-            this.groups[p].update();
+            group = this.groups[p];
+            group.buldgeX = this.mouseX;
+            group.buldgeY = this.mouseY;
+            group.update(delta);
         }
 
         for(var i = 0; i < this.curves.length; i++)
         {
-            this.curves[i].render();
+            curve = this.curves[i];
+            curve.render();
             
         }
         

@@ -40,6 +40,14 @@ var PointGroup = function()
         // Control point length
         controlPointLength: 1,
 
+        // Distortion Point
+        buldgeX: 0,
+        buldgeY: 0,
+        buldgeMultiplier: 0.5,
+
+        // Buldge Smoother
+        spring: null,
+
     	//----------------------------------------
     	// PUBLIC METHODS
     	//----------------------------------------
@@ -49,9 +57,12 @@ var PointGroup = function()
     		_.bindAll(this, 'init', 'update');
 
     		this.points = [];
+
+            this.spring = new SpringSmooth(false);
+            this.spring.power = 0.5;
     	},
 
-    	update: function() 
+    	update: function(delta) 
     	{
     		// Number of points in the group
     		var length = this.points.length;
@@ -60,9 +71,25 @@ var PointGroup = function()
     		var baseX = this.width * this.originX;
     		var baseY = this.height * this.originY;
 
+            // Determine the distance from the buldge point.
+            var buldgeDistanceX = Math.abs(this.buldgeX - baseX);
+            var buldgeDistanceY = Math.abs(this.buldgeY - baseY);
+
+            var buldgeLimit = Math.round(this.width / 2);
+
+            var px = (buldgeLimit - Math.min(buldgeDistanceX, buldgeLimit)) / buldgeLimit;
+            var py = (buldgeLimit - Math.min(buldgeDistanceY, buldgeLimit)) / buldgeLimit;
+            var p = px * py;
+            var p2 = -0.5 * (Math.cos(Math.PI * p) - 1);
+
+            this.spring.target = p2;
+            
+            var buldgeAmount = this.spring.update(delta);
+
+
     		// The distance the group will spread
 	        var spreadX = this.width * this.percentageX;
-	        var spreadY = this.height * this.percentageY;
+	        var spreadY = this.height * this.percentageY * (1 + buldgeAmount * this.buldgeMultiplier);
 
 	        // The space between each point
 	        var spaceX = spreadX / (length - 1);
@@ -77,8 +104,8 @@ var PointGroup = function()
 	        for(var i = 0; i < length; i++)
 	        {
 	        	point = this.points[i];
-                point.oscillateX += point.incrementX;
-                point.oscillateY += point.incrementY;
+                point.oscillateX += point.incrementX * (1 - buldgeAmount * 0.75);
+                point.oscillateY += point.incrementY * (1 - buldgeAmount * 0.75);
 	            point.x = startX + spaceX * i + Math.cos(point.oscillateX * MathUtils.DEGREES_TO_RADIANS) * this.rangeX;
 	            point.y = startY + spaceY * i + Math.cos(point.oscillateY * MathUtils.DEGREES_TO_RADIANS) * this.rangeY;
                 point.cpLength = this.controlPointLength;

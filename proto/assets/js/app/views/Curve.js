@@ -12,7 +12,7 @@ var Curve = BaseView.extend({
     height: 1,
     
     showControls: true,
-    controlSize: 4,
+    controlSize: 3,
     controlColor: 0xFFFFFF,
 
 
