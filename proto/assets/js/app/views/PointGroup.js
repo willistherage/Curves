@@ -37,6 +37,9 @@ var PointGroup = function()
     	width: 800,
     	height: 600,
 
+        // Control point length
+        controlPointLength: 1,
+
     	//----------------------------------------
     	// PUBLIC METHODS
     	//----------------------------------------
@@ -78,6 +81,11 @@ var PointGroup = function()
                 point.oscillateY += point.incrementY;
 	            point.x = startX + spaceX * i + Math.cos(point.oscillateX * MathUtils.DEGREES_TO_RADIANS) * this.rangeX;
 	            point.y = startY + spaceY * i + Math.cos(point.oscillateY * MathUtils.DEGREES_TO_RADIANS) * this.rangeY;
+                point.cpLength = this.controlPointLength;
+                point.cpX1 = point.x - point.cpLength * 0.5;
+                point.cpY1 = point.y;
+                point.cpX2 = point.x + point.cpLength * 0.5;
+                point.cpY2 = point.y;
 	        }
 	        
     	}

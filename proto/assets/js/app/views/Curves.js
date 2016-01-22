@@ -10,12 +10,11 @@ var Curves = BaseView.extend({
     pointCount: 6,
     curves:[],
     groups: [],
-    dotSize: 6,
 
     //
     progress: 0,
     duration: 1,
-    colors: [0xFF00CC, 0xFF00AA, 0xFF0099, 0xFF0077, 0xFF0055, 0xFF0033, 0xFF0011, 0xFF3333],
+    colors: [0xb39bc8, 0xad2e95, 0xf172a1, 0x1f3463, 0xe64398, 0xb39bc8, 0xad2e95, 0xe64398, 0x1f3463],
 
     //----------------------------------------
     // PUBLIC METHODS
@@ -46,9 +45,8 @@ var Curves = BaseView.extend({
         {
             curve = new Curve({
                 pointCount: this.pointCount,
-                color: this.colors[i],
-                graphics: this.graphics,
-                dotSize: this.dotSize
+                color: this.colors[i+1],
+                graphics: this.graphics
             });
 
             curve.init();
@@ -67,6 +65,7 @@ var Curves = BaseView.extend({
             group.width = this.winWidth;
             group.height = this.winHeight;
             group.originX = p / (this.pointCount-1);
+            group.controlPointLength = this.winWidth / (this.pointCount-1);
             group.init();
 
             for(var c = 0; c < this.curveCount; c++)
@@ -142,6 +141,8 @@ var Curves = BaseView.extend({
         {
             this.groups[p].width = width;
             this.groups[p].height = height;
+
+            this.groups[p].controlPointLength = this.winWidth / (this.pointCount-1);
         }
     },
 
@@ -170,6 +171,10 @@ var Curves = BaseView.extend({
 
         this.graphics.clear();
 
+
+        this.graphics.beginFill(this.colors[0], 1);
+        this.graphics.drawRect(0, 0, this.winWidth, this.winHeight);
+        this.graphics.endFill();
 
         for(var p = 0; p < this.groups.length; p++)
         {
