@@ -39,6 +39,9 @@ var Curves = BaseView.extend({
 
         this.stage.addChild(this.graphics);
         
+        var colors = new Colors();
+        //colors.init();
+
         this.curves = [];
         
         var curve;
