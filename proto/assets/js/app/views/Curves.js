@@ -192,8 +192,8 @@ var Curves = BaseView.extend({
         for(var p = 0; p < this.groups.length; p++)
         {
             group = this.groups[p];
-            group.buldgeX = this.mouseX;
-            group.buldgeY = this.mouseY;
+            group.bulgeX = this.mouseX;
+            group.bulgeY = this.mouseY;
             group.update(delta);
         }
 
