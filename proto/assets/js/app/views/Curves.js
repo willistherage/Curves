@@ -30,7 +30,7 @@ var Curves = BaseView.extend({
 		
         this.bind();
 
-		_.bindAll(this, 'init', 'addListeners', 'removeListeners', 'onMouseMove', 'onUpdate', 'setColor', 'incrementColor', 'toggleControls');
+		_.bindAll(this, 'init', 'addListeners', 'removeListeners', 'onMouseMove', 'update', 'setColor', 'incrementColor', 'toggleControls');
 
         this.addListeners();
 
@@ -219,15 +219,11 @@ var Curves = BaseView.extend({
 
     addListeners: function()
     {
-        AnimationFrame.addListener(this.onUpdate);
-
         window.addEventListener('mousemove', this.onMouseMove);
     },
 
     removeListeners: function()
     {
-        AnimationFrame.removeListener(this.onUpdate);
-
         window.removeEventListener('mousemove', this.onMouseMove);
     },
 
@@ -241,7 +237,7 @@ var Curves = BaseView.extend({
         this.mouseY = event.clientY;
     },
 
-    onUpdate: function(delta, time)
+    update: function(delta, time)
     {
         if(!this.graphics || !this.groups || !this.curves)
             return;

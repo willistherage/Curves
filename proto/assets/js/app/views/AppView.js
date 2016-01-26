@@ -13,6 +13,7 @@ var CurveAppView = BaseView.extend({
     resolution: 1,
     defaultWidth: 800,
     defaultHeight: 600,
+    stats: null,
 
     //----------------------------------------
     // PUBLIC METHODS
@@ -45,6 +46,14 @@ var CurveAppView = BaseView.extend({
         // Creating the Curves
         this.curves = new Curves({stage: this.stage, curveCount: 8, width: this.defaultWidth, height: this.defaultHeight});
         this.curves.init();
+
+        this.stats = new Stats();
+        this.stats.setMode( 1 );
+        this.stats.domElement.style.position = 'absolute';
+        this.stats.domElement.style.left = '0px';
+        this.stats.domElement.style.top = '0px';
+
+        document.body.appendChild( this.stats.domElement );
 
         this.addListeners();
 	},
@@ -129,9 +138,12 @@ var CurveAppView = BaseView.extend({
 
 
 
-    onUpdate: function(event)
-    {    
+    onUpdate: function(delta, time)
+    {
+        this.stats.begin();
+        this.curves.update(delta, time);
         this.renderer.render(this.stage);
+        this.stats.end();
     },
 
     onResize: function(event)
