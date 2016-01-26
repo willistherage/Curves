@@ -22,7 +22,7 @@ var CurveAppView = BaseView.extend({
 		
         this.bind();
         
-        _.bindAll(this, 'init', 'addListeners', 'removeListeners', 'onUpdate', 'onResize');
+        _.bindAll(this, 'init', 'addListeners', 'removeListeners', 'onKeyPress', 'onUpdate', 'onResize');
 
         // Initializing animation frame
         AnimationFrame.init();
@@ -59,6 +59,22 @@ var CurveAppView = BaseView.extend({
         this.onResize();
 
         AnimationFrame.addListener(this.onUpdate);
+
+        /*
+        document.addEventListener('touchstart', this.onBlockedEvent, false);
+        document.addEventListener('touchmove', this.onBlockedEvent, false);
+        document.addEventListener('touchend', this.onBlockedEvent, false);
+        */
+
+        if (document.attachEvent)
+        {
+            document.attachEvent("onkeydown", this.onKeyPress);
+        }
+         else if (document.addEventListener)
+        {
+            document.addEventListener("keydown", this.onKeyPress, false);
+        }
+
     },
 
     removeListeners: function()
@@ -66,18 +82,59 @@ var CurveAppView = BaseView.extend({
         $(window).unbind('resize', this.onResize);
 
         AnimationFrame.removeListener(this.onUpdate);
+
+        /*
+        document.removeEventListener('touchstart', this.onBlockedEvent, false);
+        document.removeEventListener('touchmove', this.onBlockedEvent, false);
+        document.removeEventListener('touchend', this.onBlockedEvent, false);
+        */
+
+        if (document.detachEvent)
+        {
+            document.detachEvent("onkeydown", this.onKeyPress);
+        }
+         else if (document.removeEventListener)
+        {
+            document.removeEventListener("keydown", this.onKeyPress);
+        }
     },
 
     //----------------------------------------
     // EVENT HANDLERS
     //----------------------------------------
 
-    onUpdate: function() {
-        
+    onKeyPress: function(event)
+    {
+        switch(event.keyCode)
+        {
+            case 32: //Space
+                this.curves.toggleControls();
+                break;
+            case 38: //Up Arrow
+                this.curves.incrementColor(1);
+                break;
+            case 40: //Down Arrow
+                this.curves.incrementColor(-1);
+                break;
+            case 37: //Left Arrow
+                //
+                break;
+            case 39: //Right Arrow
+                //
+                break;
+            default:
+                break;
+        }
+    },
+
+
+
+    onUpdate: function(event)
+    {    
         this.renderer.render(this.stage);
     },
 
-    onResize: function()
+    onResize: function(event)
     {
         this.width = window.innerWidth;
         this.height = window.innerHeight;

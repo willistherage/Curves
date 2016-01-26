@@ -33,9 +33,13 @@ var Colors = function()
             
             this.list = [];
 
+            var color;
+
             for(var i = 0; i < defaultColors.length; i++)
             {
-                this.list.push(new Color(defaultColors[i]));
+                color = new Color(defaultColors[i]);
+                color.setPower(0.1 + 0.075 * i);
+                this.list.push(color);
             }
     	},
 
@@ -45,7 +49,7 @@ var Colors = function()
             
             for(var i = 0; i < this.list.length; i++)
             {
-                this.list[i].shift(this.colorList[i]);
+                this.list[i].shift(this.colorList[this.colorIndex][i]);
             }
 
         },

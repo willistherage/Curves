@@ -11,9 +11,13 @@ var Curve = BaseView.extend({
     width: 1,
     height: 1,
     
-    showControls: true,
-    controlSize: 3,
+    controlCenter: 3,
+    controlStroke: 2,
+    controlHandle: 2,
     controlColor: 0xFFFFFF,
+
+    incrementSpeed: 0.5,
+    incrementSpeedRandomness: 0.75,
 
 
     //----------------------------------------
@@ -25,7 +29,7 @@ var Curve = BaseView.extend({
 		
         this.bind();
 
-		_.bindAll(this, 'init', 'render');
+		_.bindAll(this, 'init', 'renderCurve', 'renderControls');
 
         this.pointCount = this.options.pointCount;
         this.color = this.options.color;
@@ -38,15 +42,17 @@ var Curve = BaseView.extend({
         for(var i = 0; i < this.pointCount; i++)
         {
             point = new Point();
-            point.incrementY = 0.5 + Math.random() * 1;
+            point.incrementX = this.incrementSpeed + (Math.random() * 2 - 1) * (this.incrementSpeed * this.incrementSpeedRandomness);
+            point.incrementY = this.incrementSpeed + (Math.random() * 2 - 1) * (this.incrementSpeed * this.incrementSpeedRandomness);
+            point.oscillateX = Math.round(Math.random() * 360);
             point.oscillateY = Math.round(Math.random() * 360);
             this.points.push(point);
         }
 	},
 
-    render: function()
+    renderCurve: function()
     {
-        this.graphics.beginFill(this.color, 1);
+        this.graphics.beginFill(this.color.color, 1);
 
         this.graphics.moveTo(0, this.height);
 
@@ -74,22 +80,37 @@ var Curve = BaseView.extend({
         this.graphics.lineTo(this.width, this.height);
         this.graphics.lineTo(0, this.height);
         this.graphics.endFill();
+    },
 
-        if(this.showControls)
+    renderControls: function()
+    {
+        var p;
+
+        for(var c = 0; c < this.points.length; c++)
         {
-            var p;
-
-            this.graphics.beginFill(0xFFFFFF, 1);
-
-            for(var c = 0; c < this.points.length; c++)
-            {
-                p = this.points[c];
-                this.graphics.drawCircle(p.x, p.y, this.controlSize);
-            }
+            p = this.points[c];
 
             this.graphics.endFill();
+            this.graphics.lineStyle(this.controlStroke, this.controlColor, 0.25);
+            this.graphics.moveTo(p.cpX1, p.cpY1);
+            this.graphics.lineTo(p.x, p.y);
+            this.graphics.lineTo(p.cpX2, p.cpY2);
+
+            //Draw control center and handles
+            this.graphics.lineStyle(0, 0, 0);
+            this.graphics.beginFill(this.controlColor, 1);
+            this.graphics.drawCircle(p.cpX1, p.cpY1, this.controlHandle);
+            this.graphics.drawCircle(p.cpX2, p.cpY2, this.controlHandle);
+
+            if(p.tracer)
+            {  
+                this.graphics.beginFill(this.controlColor, Math.abs((p.oscillateX % 18) - 9) / 9);
+            }
+
+            this.graphics.drawCircle(p.x, p.y, this.controlCenter);
         }
 
-        
+        this.graphics.endFill();
     }
+
 });
