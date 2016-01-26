@@ -59,6 +59,7 @@ var PointGroup = function()
         // Neighbors
         neighbors: [],
         neighborInfluence: 0.25,
+        uniformHandles: false,
 
     	//----------------------------------------
     	// PUBLIC METHODS
@@ -158,9 +159,10 @@ var PointGroup = function()
                 var wp = 180 * adist;
                 var wc = (1 + Math.cos(wp * MathUtils.DEGREES_TO_RADIANS)) * 0.5;
 
-                oscY -= wc * (this.waveAmplitude * this.height);
+                //oscY -= wc * (this.waveAmplitude * this.height);
                 oscX *= this.roamX * this.width * this.roamDampener;
-                oscY *= this.roamY * this.height * this.roamDampener;
+                oscY *= (this.roamY * this.height * this.roamDampener);
+                oscY -= wc * (this.waveAmplitude * this.height);
                 
                 // Calculate repulsion
 
@@ -175,7 +177,10 @@ var PointGroup = function()
                 
                 // Lock points to edges
 
-                var n1, n2, na, nx, ny, nd, a, A, b, B, c, C, s;
+                var n1, n2, na, nx, ny, nd;
+                var a1, A1, b1, B1, c1, C1, s1;
+                var a2, A2, b2, B2, c2, C2, s2;
+                var cdx1, cdy1, cdx2, cdy2;
 
                 if(this.originX == 0)
                 {
@@ -197,28 +202,65 @@ var PointGroup = function()
                     n1 = this.neighbors[0].points[i];
                     n2 = this.neighbors[1].points[i];
                     nx = n1.x - n2.x;
-                    ny = (n1.y - n2.y) * this.neighborInfluence;
-                    na = Math.atan2(ny, nx);
+                    ny = n1.y - n2.y;
+                    na = Math.atan2(ny * this.neighborInfluence, nx);
 
-                    b = this.controlPointLength * 0.5;
-                    B = 90;
-                    s = b / Math.sin(MathUtils.DEGREES_TO_RADIANS * B);
+                    if(this.uniformHandles)
+                    {
+                        b1 = this.controlPointLength * 0.5;
+                        B1 = 90;
+                        s1 = b1 / Math.sin(MathUtils.DEGREES_TO_RADIANS * B1);
 
-                    A = 180 - (na * MathUtils.RADIANS_TO_DEGREES);
-                    a = s * Math.sin(MathUtils.DEGREES_TO_RADIANS * A);
+                        A1 = 180 - (na * MathUtils.RADIANS_TO_DEGREES);
+                        a1 = s1 * Math.sin(MathUtils.DEGREES_TO_RADIANS * A1);
 
-                    C = 90 - A;
-                    c = s * Math.sin(MathUtils.DEGREES_TO_RADIANS * C);
+                        C1 = 90 - A1;
+                        c1 = s1 * Math.sin(MathUtils.DEGREES_TO_RADIANS * C1);
 
-                    var x1a = point.x - c;
-                    var y1a = point.y + a;
-                    var x2a = point.x + c;
-                    var y2a = point.y - a;
+                        point.cpX1 = point.x - c1;
+                        point.cpY1 = point.y + a1;
+                        point.cpX2 = point.x + c1;
+                        point.cpY2 = point.y - a1;
+                    }
+                     else
+                    {
+                        n1 = this.neighbors[0].points[i];
+                        n2 = point;
 
-                    point.cpX1 = x1a;
-                    point.cpY1 = y1a;
-                    point.cpX2 = x2a;
-                    point.cpY2 = y2a;
+                        cdx1 = n1.x - n2.x;
+                        cdy1 = n1.y - n2.y;
+
+                        n1 = point;
+                        n2 = this.neighbors[1].points[i];
+
+                        cdx2 = n1.x - n2.x;
+                        cdy2 = n1.y - n2.y;
+
+                        b1 = Math.max(Math.sqrt(cdx1 * cdx1 + cdy1 * cdy1) * 0.4, 1);
+                        B1 = 90;
+                        s1 = b1 / Math.sin(MathUtils.DEGREES_TO_RADIANS * B1);
+
+                        A1 = 180 - (na * MathUtils.RADIANS_TO_DEGREES);
+                        a1 = s1 * Math.sin(MathUtils.DEGREES_TO_RADIANS * A1);
+
+                        C1 = 90 - A1;
+                        c1 = s1 * Math.sin(MathUtils.DEGREES_TO_RADIANS * C1);
+
+                        b2 = Math.max(Math.sqrt(cdx2 * cdx2 + cdy2 * cdy2) * 0.4, 1);
+                        B2 = 90;
+                        s2 = b2 / Math.sin(MathUtils.DEGREES_TO_RADIANS * B2);
+
+                        A2 = 180 - (na * MathUtils.RADIANS_TO_DEGREES);
+                        a2 = s2 * Math.sin(MathUtils.DEGREES_TO_RADIANS * A2);
+
+                        C2 = 90 - A2;
+                        c2 = s2 * Math.sin(MathUtils.DEGREES_TO_RADIANS * C2);
+
+                        point.cpX1 = point.x - c1;
+                        point.cpY1 = point.y + a1;
+                        point.cpX2 = point.x + c2;
+                        point.cpY2 = point.y - a2;
+                    }
                 }
                  else
                 {

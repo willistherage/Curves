@@ -19,7 +19,7 @@ var Curves = BaseView.extend({
     waveProgress: 0.5,
     waveTime: 0,
     waveDuration: 10,
-    waveAmplitude: 0.005,
+    waveAmplitude: 0.1,
     waveLength: 0.9,
 
     //----------------------------------------
