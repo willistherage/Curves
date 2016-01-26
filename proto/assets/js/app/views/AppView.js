@@ -14,6 +14,7 @@ var CurveAppView = BaseView.extend({
     defaultWidth: 800,
     defaultHeight: 600,
     stats: null,
+    gui: null,
 
     //----------------------------------------
     // PUBLIC METHODS
@@ -48,7 +49,7 @@ var CurveAppView = BaseView.extend({
         this.curves.init();
 
         this.stats = new Stats();
-        this.stats.setMode( 1 );
+        this.stats.setMode( 2 );
         this.stats.domElement.style.position = 'absolute';
         this.stats.domElement.style.left = '0px';
         this.stats.domElement.style.top = '0px';
