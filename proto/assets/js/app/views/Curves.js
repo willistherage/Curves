@@ -12,7 +12,8 @@ var Curves = BaseView.extend({
     groups: [],
     mouseX: 0,
     mouseY: 0,
-    showControls: false,
+    showCurveControls: false,
+    showWaveControls: false,
     colors: null,
 
     // Wave
@@ -30,7 +31,7 @@ var Curves = BaseView.extend({
 		
         this.bind();
 
-		_.bindAll(this, 'init', 'addListeners', 'removeListeners', 'onMouseMove', 'update', 'setColor', 'incrementColor', 'toggleControls');
+		_.bindAll(this, 'init', 'addListeners', 'removeListeners', 'onMouseMove', 'update', 'setColor', 'incrementColor');
 
         this.addListeners();
 
@@ -203,14 +204,19 @@ var Curves = BaseView.extend({
         this.colors.shift(MathUtils.loopIndex(0, length, target));
     },
 
-    toggleControls: function()
+    updatePoints: function(dampener, influence, uniform)
     {
-        this.showControls = !this.showControls;
 
-        for(var i = 0; i < this.curves.length; i++)
-        {
-            this.curves[i].showControls = this.showControls;
-        }
+    },
+
+    updateStrength: function(strength, dampener)
+    {
+
+    },
+
+    updateWave: function(width, amplitude, duration)
+    {
+
     },
 
     //----------------------------------------
@@ -276,19 +282,21 @@ var Curves = BaseView.extend({
             curve.renderCurve();
         }
 
-        if(this.showControls)
+        if(this.showCurveControls)
         {
             for(var i = 0; i < this.curves.length; i++)
             {
                 curve = this.curves[i];
                 curve.renderControls();
             }
+        }
 
+        if(this.showWaveControls)
+        {
             this.graphics.beginFill(0x111111, 0.1);
             this.graphics.drawRect(wavePosition - 1, 0, 2, this.winHeight);
             this.graphics.drawRect(wavePosition - waveWidth * 0.5, 0, waveWidth, this.winHeight);
             this.graphics.endFill();
-
         }
     }
 });
