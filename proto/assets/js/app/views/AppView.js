@@ -15,7 +15,7 @@ var CurveAppView = BaseView.extend({
     defaultHeight: 600,
     stats: null,
     gui: null,
-    guiControl: null,
+    gc: null,
 
     //----------------------------------------
     // PUBLIC METHODS
@@ -25,7 +25,7 @@ var CurveAppView = BaseView.extend({
 		
         this.bind();
         
-        _.bindAll(this, 'init', 'setupGUI', 'addListeners', 'removeListeners', 'onKeyPress', 'onUpdate', 'onResize', 'onPointsChanged', 'onStrengthChanged', 'onWaveChanged', 'onShowFPSChanged', 'onShowWaveChanged', 'onShowCurvesChanged');
+        _.bindAll(this, 'init', 'setupGUI', 'addListeners', 'removeListeners', 'onKeyPress', 'onUpdate', 'onResize', 'onCanvasChanged', 'onGroupsChanged', 'onPointsChanged', 'onForcesChanged', 'onWaveChanged', 'onColorsChanged', 'onShowFPSChanged', 'onShowWaveChanged', 'onShowBezierChanged');
 
         // Initializing animation frame
         AnimationFrame.init();
@@ -70,37 +70,62 @@ var CurveAppView = BaseView.extend({
     {
         // Initialize GUI
         this.gui = new dat.GUI();
-        this.guiControl = new GUIControl();
+        this.gc = new GUIControl();
 
-        this.guiControl.pointFolder = this.gui.addFolder("Curves");
-        this.roamDampenerControl = this.guiControl.pointFolder.add(this.guiControl, 'roamDampener', 0, 1).step(0.01);
+        this.gc.canvas.eventHandler = this.onCanvasChanged;
+        this.gc.group1.eventHandler = this.onGroupsChanged;
+        this.gc.points.eventHandler = this.onPointsChanged;
+        this.gc.forces.eventHandler = this.onForcesChanged;
+        this.gc.wave.eventHandler = this.onWaveChanged;
+
+        for(var el in this.gc)
+        {
+            var data = this.gc[el];
+
+            data.folder = this.gui.addFolder(data.name);
+
+            for(var p in data.properties)
+            {
+                var prop = data.properties[p];
+                
+                //prop.control = data.folder.add(data.properties, )
+            }
+        }
+
+        /*
+        this.gc.canvasFolder = this.gui.addFolder("Canvas");
+        this.
+
+        this.gc.pointFolder = this.gui.addFolder("Curves");
+        this.roamDampenerControl = this.gc.pointFolder.add(this.gc, 'roamDampener', 0, 1).step(0.01);
         this.roamDampenerControl.onFinishChange(this.onRoamDampenerChanged);
-        this.neighborInfluenceControl = this.guiControl.pointFolder.add(this.guiControl, 'neighborInfluence', 0, 1).step(0.01);
+        this.neighborInfluenceControl = this.gc.pointFolder.add(this.gc, 'neighborInfluence', 0, 1).step(0.01);
         this.neighborInfluenceControl.onFinishChange(this.onNeighborInfluenceChanged);
-        this.uniformHandlesControl = this.guiControl.pointFolder.add(this.guiControl, 'uniformHandles');
+        this.uniformHandlesControl = this.gc.pointFolder.add(this.gc, 'uniformHandles');
         this.uniformHandlesControl.onFinishChange(this.onUniformHandlesChanged);
 
-        this.guiControl.forceFolder = this.gui.addFolder("Forces");
-        this.strengthControl = this.guiControl.forceFolder.add(this.guiControl, 'strength', 0, 2000).step(10);
+        this.gc.forceFolder = this.gui.addFolder("Forces");
+        this.strengthControl = this.gc.forceFolder.add(this.gc, 'strength', 0, 2000).step(10);
         this.strengthControl.onFinishChange(this.onStrengthChanged);
-        this.strengthDampenerControl = this.guiControl.forceFolder.add(this.guiControl, 'strengthDampener', 0, 1).step(0.01);
+        this.strengthDampenerControl = this.gc.forceFolder.add(this.gc, 'strengthDampener', 0, 1).step(0.01);
         this.strengthDampenerControl.onFinishChange(this.onStrengthDampenerChanged);
 
-        this.guiControl.waveFolder = this.gui.addFolder("Waves");
-        this.waveWidthControl = this.guiControl.waveFolder.add(this.guiControl, 'waveWidth', 0, 1).step(0.01);
+        this.gc.waveFolder = this.gui.addFolder("Waves");
+        this.waveWidthControl = this.gc.waveFolder.add(this.gc, 'waveWidth', 0, 1).step(0.01);
         this.waveWidthControl.onFinishChange(this.onWaveChanged);
-        this.waveAmplitudeControl = this.guiControl.waveFolder.add(this.guiControl, 'waveAmplitude', 0, 1).step(0.01);
+        this.waveAmplitudeControl = this.gc.waveFolder.add(this.gc, 'waveAmplitude', 0, 1).step(0.01);
         this.waveAmplitudeControl.onFinishChange(this.onWaveChanged);
-        this.waveDurationControl = this.guiControl.waveFolder.add(this.guiControl, 'waveDuration', 0, 20).step(1);
+        this.waveDurationControl = this.gc.waveFolder.add(this.gc, 'waveDuration', 0, 20).step(1);
         this.waveDurationControl.onFinishChange(this.onWaveChanged);
         
-        this.guiControl.debugFolder = this.gui.addFolder("Debug");
-        this.showFPSControl = this.guiControl.debugFolder.add(this.guiControl, 'showFPS');
+        this.gc.debugFolder = this.gui.addFolder("Debug");
+        this.showFPSControl = this.gc.debugFolder.add(this.gc, 'showFPS');
         this.showFPSControl.onFinishChange(this.onShowFPSChanged);
-        this.showWaveControl = this.guiControl.debugFolder.add(this.guiControl, 'showWave');
+        this.showWaveControl = this.gc.debugFolder.add(this.gc, 'showWave');
         this.showWaveControl.onFinishChange(this.onShowWaveChanged);
-        this.showCurvesControl = this.guiControl.debugFolder.add(this.guiControl, 'showCurves');
+        this.showCurvesControl = this.gc.debugFolder.add(this.gc, 'showCurves');
         this.showCurvesControl.onFinishChange(this.onShowCurvesChanged);
+        */
 
         //controller.onChange(function(value) {});
         //controller.onFinishChange(function(value) {});
@@ -206,32 +231,47 @@ var CurveAppView = BaseView.extend({
     // GUI CHANGE EVENTS
     //----------------------------------------
     
-    onPointsChanged:function(value)
+    onCanvasChanged: function()
     {
-        this.curves.updatePoints(this.guiControl.roamDampener, this.guiControl.neighborInfluence, this.guiControl.uniformHandles);
+        //
     },
 
-    onStrengthChanged:function(value)
+    onGroupsChanged: function()
     {
-        this.curves.updateStrength(this.guiControl.strength, this.guiControl.strengthDampener);
+        //
     },
 
-    onWaveChanged:function(value)
+    onPointsChanged: function()
     {
-        this.curves.updateWave(this.guiControl.waveWidth, this.guiControl.waveAmplitude, this.guiControl.waveDuration);
+        //this.curves.updatePoints(this.gc.roamDampener, this.gc.neighborInfluence, this.gc.uniformHandles);
     },
 
-    onShowFPSChanged:function(value)
+    onForcesChanged: function()
+    {
+        //this.curves.updateStrength(this.gc.strength, this.gc.strengthDampener);
+    },
+
+    onWaveChanged: function()
+    {
+        //this.curves.updateWave(this.gc.waveWidth, this.gc.waveAmplitude, this.gc.waveDuration);
+    },
+
+    onColorsChanged: function()
+    {
+        //this.curves.updateWave(this.gc.waveWidth, this.gc.waveAmplitude, this.gc.waveDuration);
+    },
+
+    onShowFPSChanged: function(value)
     {
         // toggle fps
     }, 
 
-    onShowWaveChanged:function(value)
+    onShowWaveChanged: function(value)
     {
         this.curves.showWaveControls = value;
     }, 
 
-    onShowCurvesChanged:function(value)
+    onShowBezierChanged:function(value)
     {
         this.curves.showCurveControls = value;
     }
