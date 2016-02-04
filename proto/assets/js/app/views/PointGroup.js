@@ -49,7 +49,7 @@ var PointGroup = function()
         bulgeX: 0,
         bulgeY: 0,
         strength: 1000,
-        strengthDampener: 1,
+        strengthDampener: 0,
 
         // Wave distortion
         wavePosition: 0,
@@ -67,52 +67,13 @@ var PointGroup = function()
 
     	init: function()
     	{
-    		_.bindAll(this, 'init', 'updatePointValues', 'update');
+    		_.bindAll(this, 'init', 'update');
 
     		this.points = [];
 
             this.spring = new SpringSmooth(false);
             this.spring.power = 0.5;
     	},
-
-        updatePointValues: function()
-        {
-            // Number of points in the group
-            var length = this.points.length;
-
-            // The base location of the group
-            var baseX = this.width * this.originX;
-            var baseY = this.height * this.originY;
-
-            // The distance the group will spread
-            var spreadX = this.width * this.percentageX;
-            var spreadY = this.height * this.percentageY;
-
-            // The space between each point
-            var spaceX = spreadX / (length - 1);
-            var spaceY = spreadY / (length - 1);
-
-            // Get the starting point of the point distribution
-            var startX = baseX - spreadX * this.centerX;
-            var startY = baseY - spreadY * this.centerY;
-
-            var point;
-
-            for(var i = 0; i < length; i++)
-            {
-                point = this.points[i];
-                point.x = point.ox = startX + spaceX * i + point.seedX * (this.rangeX * this.width);
-                point.y = point.oy = startY + spaceY * i + point.seedY * (this.rangeY * this.height);
-
-                point.cpLength = this.controlPointLength;
-                point.cpX1 = point.x - point.cpLength * 0.5;
-                point.cpY1 = point.y;
-                point.cpX2 = point.x + point.cpLength * 0.5;
-                point.cpY2 = point.y;
-            }
-
-            this.strength = Math.sqrt(this.width * this.width + this.height* this.height) * this.strengthDampener;
-        },
 
     	update: function(delta) 
     	{
@@ -143,6 +104,18 @@ var PointGroup = function()
 	        {
 	        	point = this.points[i];
                 
+                // Update Original Position
+
+                point.ox = startX + spaceX * i + point.seedX * (this.rangeX * this.width);
+                point.oy = startY + spaceY * i + point.seedY * (this.rangeY * this.height);
+
+                if(point.brandnew)
+                {
+                    point.x = point.ox;
+                    point.y = point.oy;
+                    point.brandnew = false;
+                }
+
                 // Calculate oscillation
 
                 point.oscillateX += point.incrementX;
@@ -170,11 +143,11 @@ var PointGroup = function()
                 dy = point.y - this.bulgeY;
                 angle = Math.atan2(dy, dx);
                 dist = this.strength / Math.sqrt(dx * dx + dy * dy);
-                point.x += Math.cos(angle) * dist;
-                point.y += Math.sin(angle) * dist;
+                point.x += Math.cos(angle) * dist * (1 - this.strengthDampener);
+                point.y += Math.sin(angle) * dist * (1 - this.strengthDampener);
                 point.x += (point.ox + oscX - point.x) * 0.1;
                 point.y += (point.oy + oscY - point.y) * 0.1;
-                
+
                 // Lock points to edges
 
                 var n1, n2, na, nx, ny, nd;

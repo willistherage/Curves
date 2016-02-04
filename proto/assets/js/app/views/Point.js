@@ -1,6 +1,7 @@
 var Point = function(options) {
 	
 	var b = {
+		brandnew: true, // Whether or not the point has been given its initial position
 		x: 0, // Current X position
 		y: 0, // Current Y position
 		ox: 0, // Origin X position

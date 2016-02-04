@@ -15,6 +15,7 @@ var Curves = BaseView.extend({
     showCurveControls: false,
     showWaveControls: false,
     colors: null,
+    fullscreen: true,
 
     // Wave
     waveProgress: 0.5,
@@ -22,6 +23,10 @@ var Curves = BaseView.extend({
     waveDuration: 10,
     waveAmplitude: 0.1,
     waveLength: 0.9,
+
+    // Force
+    strength: 0,
+    strengthDampener: 0,
 
     //----------------------------------------
     // PUBLIC METHODS
@@ -85,80 +90,13 @@ var Curves = BaseView.extend({
             this.groups.push(group);
         }
 
-        // Group 1
-        group = this.groups[0];
-        group.rangeX = 0;
-        group.rangeY = 0.004;
-        group.roamX = 0;
-        group.roamY = 0.004;
-        group.percentageY = 0.2;
-        group.originY = 1.2;
-        group.centerY = 1;
-        group.neighbors = [this.groups[0], this.groups[1]];
-        group.updatePointValues();
-        
-        // Group 2
-        group = this.groups[1];
-        group.rangeX = 0.025;
-        group.rangeY = 0.01;
-        group.roamX = 0.025;
-        group.roamY = 0.01;
-        group.percentageY = 0.65;
-        group.originY = 1;
-        group.centerY = 0.75;
-        group.points[0].tracer = true;
-        group.neighbors = [this.groups[0], this.groups[2]];
-        group.updatePointValues();
-
-         // Group 3
-        group = this.groups[2];
-        group.rangeX = 0.025;
-        group.rangeY = 0.02;
-        group.roamX = 0.025;
-        group.roamY = 0.02;
-        group.percentageY = 0.45;
-        group.originY = 0.65;
-        group.centerY = 0.5;
-        group.neighbors = [this.groups[1], this.groups[3]];
-        group.updatePointValues();
-
-         // Group 4
-        group = this.groups[3];
-        group.rangeX = 0.02;
-        group.rangeY = 0.03;
-        group.roamX = 0.02;
-        group.roamY = 0.03;
-        group.percentageY = 0.8;
-        group.originY = 0.5;
-        group.centerY = 0.5;
-        group.neighbors = [this.groups[2], this.groups[4]];
-        group.updatePointValues();
-
-         // Group 5
-        group = this.groups[4];
-        group.rangeX = 0.02;
-        group.rangeY = 0.015;
-        group.roamX = 0.02;
-        group.roamY = 0.015;
-        group.percentageY = 0.6;
-        group.originY = 0.5;
-        group.centerY = 0.5;
-        group.neighbors = [this.groups[3], this.groups[5]];
-        group.updatePointValues();
-
-         // Group 6
-        group = this.groups[5];
-        group.rangeX = 0;
-        group.rangeY = 0.03;
-        group.roamX = 0;
-        group.roamY = 0.03;
-        group.percentageY = 0.5;
-        group.originY = 0.6;
-        group.centerY = 0.5;
-        group.neighbors = [this.groups[4], this.groups[5]];
-        group.updatePointValues();
-
-        
+        this.groups[0].neighbors = [this.groups[0], this.groups[1]];
+        this.groups[1].neighbors = [this.groups[0], this.groups[2]];
+        this.groups[1].points[0].tracer = true;
+        this.groups[2].neighbors = [this.groups[1], this.groups[3]];
+        this.groups[3].neighbors = [this.groups[2], this.groups[4]];
+        this.groups[4].neighbors = [this.groups[3], this.groups[5]];
+        this.groups[5].neighbors = [this.groups[4], this.groups[5]];
 	},
 
     resize: function(width, height) {
@@ -185,7 +123,7 @@ var Curves = BaseView.extend({
 
             this.groups[p].controlPointLength = this.winWidth / (this.pointCount-1);
 
-            this.groups[p].updatePointValues();
+            //this.groups[p].updatePointValues();
         }
     },
 
@@ -204,17 +142,21 @@ var Curves = BaseView.extend({
         this.colors.shift(MathUtils.loopIndex(0, length, target));
     },
 
+    //----------------------------------------
+    // GUI CONNECTIONS
+    //----------------------------------------
+
+    updateGroups: function()
+    {
+
+    },
+
     updatePoints: function(dampener, influence, uniform)
     {
 
     },
 
-    updateStrength: function(strength, dampener)
-    {
-
-    },
-
-    updateWave: function(width, amplitude, duration)
+    updateForces: function(strength, dampener)
     {
 
     },
@@ -270,6 +212,8 @@ var Curves = BaseView.extend({
             group = this.groups[p];
             group.bulgeX = this.mouseX;
             group.bulgeY = this.mouseY;
+            group.strength = this.strength;
+            group.strengthDampener = this.strengthDampener;
             group.waveWidth = waveWidth;
             group.wavePosition = wavePosition;
             group.waveAmplitude = this.waveAmplitude;

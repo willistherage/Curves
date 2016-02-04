@@ -25,7 +25,7 @@ var CurveAppView = BaseView.extend({
 		
         this.bind();
         
-        _.bindAll(this, 'init', 'setupGUI', 'addListeners', 'removeListeners', 'onKeyPress', 'onUpdate', 'onResize', 'onCanvasChanged', 'onGroupsChanged', 'onPointsChanged', 'onForcesChanged', 'onWaveChanged', 'onColorsChanged', 'onShowFPSChanged', 'onShowWaveChanged', 'onShowBezierChanged');
+        _.bindAll(this, 'init', 'setupGUI', 'syncGUI', 'addListeners', 'removeListeners', 'onKeyPress', 'onUpdate', 'onResize', 'onCanvasChanged', 'onGroup1Changed', 'onGroup2Changed', 'onGroup3Changed', 'onGroup4Changed', 'onGroup5Changed', 'onGroup6Changed', 'onPointsChanged', 'onForcesChanged', 'onWaveChanged', 'onColorsChanged', 'onShowFPSChanged', 'onShowWaveChanged', 'onShowBezierChanged');
 
         // Initializing animation frame
         AnimationFrame.init();
@@ -73,7 +73,12 @@ var CurveAppView = BaseView.extend({
         this.gc = new GUIControl();
 
         this.gc.canvas.eventHandler = this.onCanvasChanged;
-        this.gc.group1.eventHandler = this.onGroupsChanged;
+        this.gc.group1.eventHandler = this.onGroup1Changed;
+        this.gc.group2.eventHandler = this.onGroup2Changed;
+        this.gc.group3.eventHandler = this.onGroup3Changed;
+        this.gc.group4.eventHandler = this.onGroup4Changed;
+        this.gc.group5.eventHandler = this.onGroup5Changed;
+        this.gc.group6.eventHandler = this.onGroup6Changed;
         this.gc.points.eventHandler = this.onPointsChanged;
         this.gc.forces.eventHandler = this.onForcesChanged;
         this.gc.wave.eventHandler = this.onWaveChanged;
@@ -88,49 +93,53 @@ var CurveAppView = BaseView.extend({
             {
                 var prop = data.properties[p];
                 
-                //prop.control = data.folder.add(data.properties, )
+                switch(prop.type)
+                {
+                    case 'number':
+                        prop.control = data.folder.add(prop, p, prop.min, prop.max).step(prop.incr).listen();
+                        if(data.eventHandler)
+                        {
+                            prop.control.onChange(data.eventHandler);
+                            prop.control.onFinishChange(data.eventHandler);
+                        }
+                        break;
+                    case 'bool':
+                        prop.control = data.folder.add(prop, p).listen();
+                        if(data.eventHandler)
+                        {
+                            prop.control.onFinishChange(data.eventHandler);
+                        }
+                        break;
+                    case 'array':
+                        //
+                        break;
+                }
             }
         }
 
-        /*
-        this.gc.canvasFolder = this.gui.addFolder("Canvas");
-        this.
+        this.gc.debug.properties.showFPS.control.onFinishChange(this.onShowFPSChanged);
+        this.gc.debug.properties.showWave.control.onFinishChange(this.onShowWaveChanged);
+        this.gc.debug.properties.showBezier.control.onFinishChange(this.onShowBezierChanged);
 
-        this.gc.pointFolder = this.gui.addFolder("Curves");
-        this.roamDampenerControl = this.gc.pointFolder.add(this.gc, 'roamDampener', 0, 1).step(0.01);
-        this.roamDampenerControl.onFinishChange(this.onRoamDampenerChanged);
-        this.neighborInfluenceControl = this.gc.pointFolder.add(this.gc, 'neighborInfluence', 0, 1).step(0.01);
-        this.neighborInfluenceControl.onFinishChange(this.onNeighborInfluenceChanged);
-        this.uniformHandlesControl = this.gc.pointFolder.add(this.gc, 'uniformHandles');
-        this.uniformHandlesControl.onFinishChange(this.onUniformHandlesChanged);
+        this.syncGUI();
+    },
 
-        this.gc.forceFolder = this.gui.addFolder("Forces");
-        this.strengthControl = this.gc.forceFolder.add(this.gc, 'strength', 0, 2000).step(10);
-        this.strengthControl.onFinishChange(this.onStrengthChanged);
-        this.strengthDampenerControl = this.gc.forceFolder.add(this.gc, 'strengthDampener', 0, 1).step(0.01);
-        this.strengthDampenerControl.onFinishChange(this.onStrengthDampenerChanged);
-
-        this.gc.waveFolder = this.gui.addFolder("Waves");
-        this.waveWidthControl = this.gc.waveFolder.add(this.gc, 'waveWidth', 0, 1).step(0.01);
-        this.waveWidthControl.onFinishChange(this.onWaveChanged);
-        this.waveAmplitudeControl = this.gc.waveFolder.add(this.gc, 'waveAmplitude', 0, 1).step(0.01);
-        this.waveAmplitudeControl.onFinishChange(this.onWaveChanged);
-        this.waveDurationControl = this.gc.waveFolder.add(this.gc, 'waveDuration', 0, 20).step(1);
-        this.waveDurationControl.onFinishChange(this.onWaveChanged);
-        
-        this.gc.debugFolder = this.gui.addFolder("Debug");
-        this.showFPSControl = this.gc.debugFolder.add(this.gc, 'showFPS');
-        this.showFPSControl.onFinishChange(this.onShowFPSChanged);
-        this.showWaveControl = this.gc.debugFolder.add(this.gc, 'showWave');
-        this.showWaveControl.onFinishChange(this.onShowWaveChanged);
-        this.showCurvesControl = this.gc.debugFolder.add(this.gc, 'showCurves');
-        this.showCurvesControl.onFinishChange(this.onShowCurvesChanged);
-        */
-
-        //controller.onChange(function(value) {});
-        //controller.onFinishChange(function(value) {});
-
-        
+    syncGUI: function()
+    {
+        this.onCanvasChanged(this.gc.canvas.properties.fullscreen.fullscreen);
+        this.onGroup1Changed();
+        this.onGroup2Changed();
+        this.onGroup3Changed();
+        this.onGroup4Changed();
+        this.onGroup5Changed();
+        this.onGroup6Changed();
+        this.onPointsChanged();
+        this.onForcesChanged();
+        this.onWaveChanged();
+        this.onColorsChanged();
+        this.onShowFPSChanged();
+        this.onShowWaveChanged();
+        this.onShowBezierChanged();
     },
 
     addListeners: function()
@@ -224,39 +233,146 @@ var CurveAppView = BaseView.extend({
 
         this.curves.resize(this.width, this.height);
 
-        this.renderer.resize(this.width, this.height);
+        if(this.gc.canvas.properties.fullscreen.fullscreen)
+            this.renderer.resize(this.width, this.height);
     },
 
     //----------------------------------------
     // GUI CHANGE EVENTS
     //----------------------------------------
     
-    onCanvasChanged: function()
+    onCanvasChanged: function(value)
     {
-        //
+        var toggle = typeof value === 'boolean';
+
+        var props = this.gc.canvas.properties;
+
+        if(!toggle && props.fullscreen.fullscreen)
+        {
+            props.fullscreen.fullscreen = false;
+        }
+
+        if(props.fullscreen.fullscreen)
+        {
+            this.renderer.resize(this.width, this.height);
+            this.curves.resize(this.width, this.height);
+        }
+         else
+        {
+            var w = props.width.width;
+            var h = props.height.height;
+            this.renderer.resize(w, h);
+            this.curves.resize(w, h);
+        }
     },
 
-    onGroupsChanged: function()
+    onGroup1Changed: function(value)
     {
-        //
+        var props = this.gc.group1.properties;
+        var group = this.curves.groups[0];
+
+        group.rangeX = props.rangeX.rangeX * 0.001;
+        group.rangeY = props.rangeY.rangeY * 0.001;
+        group.roamX = props.roamX.roamX * 0.001;
+        group.roamY = props.roamY.roamY * 0.001;
+        group.percentageY = props.percentageY.percentageY * 0.01;
+        group.originY = props.originY.originY * 0.01;
+        group.centerY = props.centerY.centerY * 0.01;
     },
 
-    onPointsChanged: function()
+    onGroup2Changed: function(value)
     {
+        var props = this.gc.group2.properties;
+        var group = this.curves.groups[1];
+
+        group.rangeX = props.rangeX.rangeX * 0.001;
+        group.rangeY = props.rangeY.rangeY * 0.001;
+        group.roamX = props.roamX.roamX * 0.001;
+        group.roamY = props.roamY.roamY * 0.001;
+        group.percentageY = props.percentageY.percentageY * 0.01;
+        group.originY = props.originY.originY * 0.01;
+        group.centerY = props.centerY.centerY * 0.01;
+    },
+
+    onGroup3Changed: function(value)
+    {
+        var props = this.gc.group3.properties;
+        var group = this.curves.groups[2];
+
+        group.rangeX = props.rangeX.rangeX * 0.001;
+        group.rangeY = props.rangeY.rangeY * 0.001;
+        group.roamX = props.roamX.roamX * 0.001;
+        group.roamY = props.roamY.roamY * 0.001;
+        group.percentageY = props.percentageY.percentageY * 0.01;
+        group.originY = props.originY.originY * 0.01;
+        group.centerY = props.centerY.centerY * 0.01;
+    },
+
+    onGroup4Changed: function(value)
+    {
+        var props = this.gc.group4.properties;
+        var group = this.curves.groups[3];
+
+        group.rangeX = props.rangeX.rangeX * 0.001;
+        group.rangeY = props.rangeY.rangeY * 0.001;
+        group.roamX = props.roamX.roamX * 0.001;
+        group.roamY = props.roamY.roamY * 0.001;
+        group.percentageY = props.percentageY.percentageY * 0.01;
+        group.originY = props.originY.originY * 0.01;
+        group.centerY = props.centerY.centerY * 0.01;
+    },
+
+    onGroup5Changed: function(value)
+    {
+        var props = this.gc.group5.properties;
+        var group = this.curves.groups[4];
+
+        group.rangeX = props.rangeX.rangeX * 0.001;
+        group.rangeY = props.rangeY.rangeY * 0.001;
+        group.roamX = props.roamX.roamX * 0.001;
+        group.roamY = props.roamY.roamY * 0.001;
+        group.percentageY = props.percentageY.percentageY * 0.01;
+        group.originY = props.originY.originY * 0.01;
+        group.centerY = props.centerY.centerY * 0.01;
+    },
+
+    onGroup6Changed: function(value)
+    {
+        var props = this.gc.group6.properties;
+        var group = this.curves.groups[5];
+
+        group.rangeX = props.rangeX.rangeX * 0.001;
+        group.rangeY = props.rangeY.rangeY * 0.001;
+        group.roamX = props.roamX.roamX * 0.001;
+        group.roamY = props.roamY.roamY * 0.001;
+        group.percentageY = props.percentageY.percentageY * 0.01;
+        group.originY = props.originY.originY * 0.01;
+        group.centerY = props.centerY.centerY * 0.01;
+    },
+
+    onPointsChanged: function(value)
+    {
+        var props = this.gc.points.properties;
         //this.curves.updatePoints(this.gc.roamDampener, this.gc.neighborInfluence, this.gc.uniformHandles);
     },
 
-    onForcesChanged: function()
+    onForcesChanged: function(value)
     {
-        //this.curves.updateStrength(this.gc.strength, this.gc.strengthDampener);
+        var props = this.gc.forces.properties;
+
+        this.curves.strength = props.strength.strength;
+        this.curves.strengthDampener = props.strengthDampener.strengthDampener * 0.01;
     },
 
-    onWaveChanged: function()
+    onWaveChanged: function(value)
     {
-        //this.curves.updateWave(this.gc.waveWidth, this.gc.waveAmplitude, this.gc.waveDuration);
+        var props = this.gc.wave.properties;
+        this.curves.waveLength = props.width.width * 0.01;
+        this.curves.waveAmplitude = props.amplitude.amplitude * 0.01;
+        this.curves.waveDuration = props.duration.duration;
     },
 
-    onColorsChanged: function()
+    onColorsChanged: function(value)
     {
         //this.curves.updateWave(this.gc.waveWidth, this.gc.waveAmplitude, this.gc.waveDuration);
     },
