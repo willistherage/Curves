@@ -16,6 +16,7 @@ var CurveAppView = BaseView.extend({
     stats: null,
     gui: null,
     gc: null,
+    downloadCount: 0,
 
     //----------------------------------------
     // PUBLIC METHODS
@@ -25,7 +26,7 @@ var CurveAppView = BaseView.extend({
 		
         this.bind();
         
-        _.bindAll(this, 'init', 'setupGUI', 'syncGUI', 'addListeners', 'removeListeners', 'onKeyPress', 'onUpdate', 'onResize', 'onCanvasChanged', 'onGroup1Changed', 'onGroup2Changed', 'onGroup3Changed', 'onGroup4Changed', 'onGroup5Changed', 'onGroup6Changed', 'onPointsChanged', 'onForcesChanged', 'onWaveChanged', 'onColorsChanged', 'onShowFPSChanged', 'onShowWaveChanged', 'onShowBezierChanged');
+        _.bindAll(this, 'init', 'setupGUI', 'syncGUI', 'addListeners', 'removeListeners', 'saveImage', 'onKeyPress', 'onUpdate', 'onResize', 'onCanvasChanged', 'onGroup1Changed', 'onGroup2Changed', 'onGroup3Changed', 'onGroup4Changed', 'onGroup5Changed', 'onGroup6Changed', 'onPointsChanged', 'onForcesChanged', 'onWaveChanged', 'onColorsChanged', 'onShowFPSChanged', 'onShowWaveChanged', 'onShowBezierChanged');
 
         // Initializing animation frame
         AnimationFrame.init();
@@ -35,7 +36,7 @@ var CurveAppView = BaseView.extend({
 
         // Initializing pixi renderer
         this.stage = new PIXI.Container();
-        this.renderer = PIXI.autoDetectRenderer(this.defaultWidth, this.defaultHeight, {antialias: true});
+        this.renderer = PIXI.autoDetectRenderer(this.defaultWidth, this.defaultHeight, {antialias: true, preserveDrawingBuffer: true});
         this.$container.append(this.renderer.view);
         
         // Grabbing reference to the canvas
@@ -188,6 +189,18 @@ var CurveAppView = BaseView.extend({
         }
     },
 
+    saveImage: function()
+    {
+        var image = this.renderer.view.toDataURL("image/png").replace("image/png", "image/octet-stream");
+        
+        var link = document.createElement("a");
+        link.download = "LoveNoteCurve"+this.downloadCount+".png";
+        link.href = image;
+        link.click();
+
+        this.downloadCount++;
+    },
+
     //----------------------------------------
     // EVENT HANDLERS
     //----------------------------------------
@@ -197,7 +210,7 @@ var CurveAppView = BaseView.extend({
         switch(event.keyCode)
         {
             case 32: //Space
-                //this.curves.toggleControls();
+                this.saveImage();
                 break;
             case 38: //Up Arrow
                 this.curves.incrementColor(1);
@@ -275,6 +288,7 @@ var CurveAppView = BaseView.extend({
         group.rangeY = props.rangeY.rangeY * 0.001;
         group.roamX = props.roamX.roamX * 0.001;
         group.roamY = props.roamY.roamY * 0.001;
+        group.roamDampener = props.roamDampener.roamDampener * 0.01;
         group.percentageY = props.percentageY.percentageY * 0.01;
         group.originY = props.originY.originY * 0.01;
         group.centerY = props.centerY.centerY * 0.01;
@@ -289,6 +303,7 @@ var CurveAppView = BaseView.extend({
         group.rangeY = props.rangeY.rangeY * 0.001;
         group.roamX = props.roamX.roamX * 0.001;
         group.roamY = props.roamY.roamY * 0.001;
+        group.roamDampener = props.roamDampener.roamDampener * 0.01;
         group.percentageY = props.percentageY.percentageY * 0.01;
         group.originY = props.originY.originY * 0.01;
         group.centerY = props.centerY.centerY * 0.01;
@@ -303,6 +318,7 @@ var CurveAppView = BaseView.extend({
         group.rangeY = props.rangeY.rangeY * 0.001;
         group.roamX = props.roamX.roamX * 0.001;
         group.roamY = props.roamY.roamY * 0.001;
+        group.roamDampener = props.roamDampener.roamDampener * 0.01;
         group.percentageY = props.percentageY.percentageY * 0.01;
         group.originY = props.originY.originY * 0.01;
         group.centerY = props.centerY.centerY * 0.01;
@@ -317,6 +333,7 @@ var CurveAppView = BaseView.extend({
         group.rangeY = props.rangeY.rangeY * 0.001;
         group.roamX = props.roamX.roamX * 0.001;
         group.roamY = props.roamY.roamY * 0.001;
+        group.roamDampener = props.roamDampener.roamDampener * 0.01;
         group.percentageY = props.percentageY.percentageY * 0.01;
         group.originY = props.originY.originY * 0.01;
         group.centerY = props.centerY.centerY * 0.01;
@@ -331,6 +348,7 @@ var CurveAppView = BaseView.extend({
         group.rangeY = props.rangeY.rangeY * 0.001;
         group.roamX = props.roamX.roamX * 0.001;
         group.roamY = props.roamY.roamY * 0.001;
+        group.roamDampener = props.roamDampener.roamDampener * 0.01;
         group.percentageY = props.percentageY.percentageY * 0.01;
         group.originY = props.originY.originY * 0.01;
         group.centerY = props.centerY.centerY * 0.01;
@@ -345,6 +363,7 @@ var CurveAppView = BaseView.extend({
         group.rangeY = props.rangeY.rangeY * 0.001;
         group.roamX = props.roamX.roamX * 0.001;
         group.roamY = props.roamY.roamY * 0.001;
+        group.roamDampener = props.roamDampener.roamDampener * 0.01;
         group.percentageY = props.percentageY.percentageY * 0.01;
         group.originY = props.originY.originY * 0.01;
         group.centerY = props.centerY.centerY * 0.01;
@@ -353,7 +372,16 @@ var CurveAppView = BaseView.extend({
     onPointsChanged: function(value)
     {
         var props = this.gc.points.properties;
-        //this.curves.updatePoints(this.gc.roamDampener, this.gc.neighborInfluence, this.gc.uniformHandles);
+
+        var groups = this.curves.groups;
+        var group;
+
+        for(var i = 0; i < groups.length; i++)
+        {
+            group = groups[i];
+            group.uniformHandles = props.uniformHandles.uniformHandles;
+            group.neighborInfluence = props.neighborInfluence.neighborInfluence * 0.01;
+        }
     },
 
     onForcesChanged: function(value)
@@ -379,8 +407,15 @@ var CurveAppView = BaseView.extend({
 
     onShowFPSChanged: function(value)
     {
-        // toggle fps
-    }, 
+        if(!this.gc.debug.properties.showFPS.showFPS)
+        {
+            $(this.stats.domElement).addClass('hide');
+        }
+         else
+        {
+            $(this.stats.domElement).removeClass('hide');
+        }
+    },
 
     onShowWaveChanged: function(value)
     {

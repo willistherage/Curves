@@ -133,8 +133,8 @@ var PointGroup = function()
                 var wc = (1 + Math.cos(wp * MathUtils.DEGREES_TO_RADIANS)) * 0.5;
 
                 //oscY -= wc * (this.waveAmplitude * this.height);
-                oscX *= this.roamX * this.width * this.roamDampener;
-                oscY *= (this.roamY * this.height * this.roamDampener);
+                oscX *= this.roamX * this.width * (1 - this.roamDampener);
+                oscY *= this.roamY * this.height * (1 - this.roamDampener);
                 oscY -= wc * (this.waveAmplitude * this.height);
                 
                 // Calculate repulsion

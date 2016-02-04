@@ -19,6 +19,10 @@ html, body {
 	transform-origin: 0px 0px;
 }
 
+.hide {
+	display: none;
+}
+
 /*
 ease: {
 		easeOutCubic:   'cubic-bezier(.215,.61,.355,1)',

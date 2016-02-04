@@ -21,6 +21,7 @@ var GUIControl = function() {
 				rangeY: {type: 'number', rangeY: 4, min: 0, max: 1000, incr: 1, control: null},
 				roamX: {type: 'number', roamX: 0, min: 0, max: 1000, incr: 1, control: null},
 				roamY: {type: 'number', roamY: 4, min: 0, max: 1000, incr: 1, control: null},
+				roamDampener: {type: 'number', roamDampener: 75, min: 0, max: 100, incr: 1, control: null},
 				percentageY: {type: 'number', percentageY: 20, min: 0, max: 100, incr: 1, control: null},
 				originY: {type: 'number', originY: 120, min: -100, max: 200, incr: 1, control: null},
 				centerY: {type: 'number', centerY: 100, min: 0, max: 100, incr: 1, control: null}
@@ -37,6 +38,7 @@ var GUIControl = function() {
 				rangeY: {type: 'number', rangeY: 10, min: 0, max: 1000, incr: 1, control: null},
 				roamX: {type: 'number', roamX: 25, min: 0, max: 1000, incr: 1, control: null},
 				roamY: {type: 'number', roamY: 10, min: 0, max: 1000, incr: 1, control: null},
+				roamDampener: {type: 'number', roamDampener: 75, min: 0, max: 100, incr: 1, control: null},
 				percentageY: {type: 'number', percentageY: 65, min: 0, max: 100, incr: 1, control: null},
 				originY: {type: 'number', originY: 100, min: -100, max: 200, incr: 1, control: null},
 				centerY: {type: 'number', centerY: 75, min: 0, max: 100, incr: 1, control: null}
@@ -53,6 +55,7 @@ var GUIControl = function() {
 				rangeY: {type: 'number', rangeY: 20, min: 0, max: 1000, incr: 1, control: null},
 				roamX: {type: 'number', roamX: 25, min: 0, max: 1000, incr: 1, control: null},
 				roamY: {type: 'number', roamY: 20, min: 0, max: 1000, incr: 1, control: null},
+				roamDampener: {type: 'number', roamDampener: 75, min: 0, max: 100, incr: 1, control: null},
 				percentageY: {type: 'number', percentageY: 45, min: 0, max: 100, incr: 1, control: null},
 				originY: {type: 'number', originY: 65, min: -100, max: 200, incr: 1, control: null},
 				centerY: {type: 'number', centerY: 50, min: 0, max: 100, incr: 1, control: null}
@@ -69,6 +72,7 @@ var GUIControl = function() {
 				rangeY: {type: 'number', rangeY: 30, min: 0, max: 1000, incr: 1, control: null},
 				roamX: {type: 'number', roamX: 20, min: 0, max: 1000, incr: 1, control: null},
 				roamY: {type: 'number', roamY: 30, min: 0, max: 1000, incr: 1, control: null},
+				roamDampener: {type: 'number', roamDampener: 75, min: 0, max: 100, incr: 1, control: null},
 				percentageY: {type: 'number', percentageY: 80, min: 0, max: 100, incr: 1, control: null},
 				originY: {type: 'number', originY: 50, min: -100, max: 200, incr: 1, control: null},
 				centerY: {type: 'number', centerY: 50, min: 0, max: 100, incr: 1, control: null}
@@ -85,6 +89,7 @@ var GUIControl = function() {
 				rangeY: {type: 'number', rangeY: 15, min: 0, max: 1000, incr: 1, control: null},
 				roamX: {type: 'number', roamX: 20, min: 0, max: 1000, incr: 1, control: null},
 				roamY: {type: 'number', roamY: 15, min: 0, max: 1000, incr: 1, control: null},
+				roamDampener: {type: 'number', roamDampener: 75, min: 0, max: 100, incr: 1, control: null},
 				percentageY: {type: 'number', percentageY: 60, min: 0, max: 100, incr: 1, control: null},
 				originY: {type: 'number', originY: 50, min: -100, max: 200, incr: 1, control: null},
 				centerY: {type: 'number', centerY: 50, min: 0, max: 100, incr: 1, control: null}
@@ -101,6 +106,7 @@ var GUIControl = function() {
 				rangeY: {type: 'number', rangeY: 30, min: 0, max: 1000, incr: 1, control: null},
 				roamX: {type: 'number', roamX: 0, min: 0, max: 1000, incr: 1, control: null},
 				roamY: {type: 'number', roamY: 30, min: 0, max: 1000, incr: 1, control: null},
+				roamDampener: {type: 'number', roamDampener: 75, min: 0, max: 100, incr: 1, control: null},
 				percentageY: {type: 'number', percentageY: 50, min: 0, max: 100, incr: 1, control: null},
 				originY: {type: 'number', originY: 60, min: -100, max: 200, incr: 1, control: null},
 				centerY: {type: 'number', centerY: 50, min: 0, max: 100, incr: 1, control: null}
@@ -113,9 +119,8 @@ var GUIControl = function() {
 			name: "Points",
 			folder: null,
 			properties: {
-				roamDampener: {type: 'number', roamDampener: 0, min: 0, max: 100, incr: 1, control: null},
 				neighborInfluence: {type: 'number', neighborInfluence: 0, min: 0, max: 100, incr: 1, control: null},
-				uniformHandles: {type: 'bool', uniformHandles: true, control: null}
+				uniformHandles: {type: 'bool', uniformHandles: false, control: null}
 			},
 			eventHandler: null
 		},
