@@ -6,8 +6,8 @@ var GUIControl = function() {
 			name: "Canvas",
 			folder: null,
 			properties: {
-				width: {type: 'number', width: 1200, min: 600, max: 1600, incr: 1, control: null},
-				height: {type: 'number', height: 630, min: 300, max: 1200, incr: 1, control: null},
+				width: {type: 'number', width: 1200, min: 600, max: 2400, incr: 1, control: null},
+				height: {type: 'number', height: 630, min: 315, max: 1260, incr: 1, control: null},
 				fullscreen: {type: 'bool', fullscreen: true, control: null},
 			},
 			eventHandler: null
@@ -119,7 +119,7 @@ var GUIControl = function() {
 			name: "Points",
 			folder: null,
 			properties: {
-				neighborInfluence: {type: 'number', neighborInfluence: 0, min: 0, max: 100, incr: 1, control: null},
+				neighborInfluence: {type: 'number', neighborInfluence: 25, min: 0, max: 100, incr: 1, control: null},
 				uniformHandles: {type: 'bool', uniformHandles: false, control: null}
 			},
 			eventHandler: null
@@ -150,7 +150,7 @@ var GUIControl = function() {
 			name: "Debug",
 			folder: null,
 			properties: {
-				showFPS: {type: 'bool', showFPS: true, control: null},
+				showFPS: {type: 'bool', showFPS: false, control: null},
 				showWave: {type: 'bool', showWave: false, control: null},
 				showBezier: {type: 'bool', showBezier: false, control: null}
 			}

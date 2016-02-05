@@ -27,7 +27,7 @@ var CurveAppView = BaseView.extend({
 		
         this.bind();
         
-        _.bindAll(this, 'init', 'setupGUI', 'syncGUI', 'addListeners', 'removeListeners', 'saveImage', 'onKeyPress', 'onUpdate', 'onResize', 'onCanvasChanged', 'onGroup1Changed', 'onGroup2Changed', 'onGroup3Changed', 'onGroup4Changed', 'onGroup5Changed', 'onGroup6Changed', 'onPointsChanged', 'onForcesChanged', 'onWaveChanged', 'onColorsChanged', 'onShowFPSChanged', 'onShowWaveChanged', 'onShowBezierChanged');
+        _.bindAll(this, 'init', 'setupGUI', 'syncGUI', 'addListeners', 'removeListeners', 'saveImage', 'onKeyPress', 'onUpdate', 'onResize', 'onTouchStart', 'onTouchMove', 'onTouchStop', 'onCanvasChanged', 'onGroup1Changed', 'onGroup2Changed', 'onGroup3Changed', 'onGroup4Changed', 'onGroup5Changed', 'onGroup6Changed', 'onPointsChanged', 'onForcesChanged', 'onWaveChanged', 'onColorsChanged', 'onShowFPSChanged', 'onShowWaveChanged', 'onShowBezierChanged');
 
         // Initializing animation frame
         AnimationFrame.init();
@@ -157,7 +157,14 @@ var CurveAppView = BaseView.extend({
         this.gc.debug.properties.showWave.control.onFinishChange(this.onShowWaveChanged);
         this.gc.debug.properties.showBezier.control.onFinishChange(this.onShowBezierChanged);
 
+        if(Modernizr.touchevents)
+        {
+            this.gc.forces.properties.strengthDampener.strengthDampener = 100;
+        }
+
         this.syncGUI();
+
+        this.gui.close();
     },
 
     syncGUI: function()
@@ -185,11 +192,12 @@ var CurveAppView = BaseView.extend({
 
         AnimationFrame.addListener(this.onUpdate);
 
-        /*
-        document.addEventListener('touchstart', this.onBlockedEvent, false);
-        document.addEventListener('touchmove', this.onBlockedEvent, false);
-        document.addEventListener('touchend', this.onBlockedEvent, false);
-        */
+        if(Modernizr.touchevents)
+        {
+            document.addEventListener('touchstart', this.onTouchStart, false);
+            document.addEventListener('touchmove', this.onTouchMove, false);
+            document.addEventListener('touchend', this.onTouchStop, false);
+        }
 
         if (document.attachEvent)
         {
@@ -208,11 +216,12 @@ var CurveAppView = BaseView.extend({
 
         AnimationFrame.removeListener(this.onUpdate);
 
-        /*
-        document.removeEventListener('touchstart', this.onBlockedEvent, false);
-        document.removeEventListener('touchmove', this.onBlockedEvent, false);
-        document.removeEventListener('touchend', this.onBlockedEvent, false);
-        */
+        if(Modernizr.touchevents)
+        {
+            document.removeEventListener('touchstart', this.onTouchStart);
+            document.removeEventListener('touchmove', this.onTouchMove);
+            document.removeEventListener('touchend', this.onTouchStop);
+        }
 
         if (document.detachEvent)
         {
@@ -262,6 +271,21 @@ var CurveAppView = BaseView.extend({
             default:
                 break;
         }
+    },
+
+    onTouchStart: function(event)
+    {
+        //
+    },
+
+    onTouchMove: function(event)
+    {
+        //
+    },
+
+    onTouchStop: function(event)
+    {
+        //
     },
 
     onUpdate: function(delta, time)
