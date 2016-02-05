@@ -7,8 +7,8 @@ var CurveAppView = BaseView.extend({
     $container: null,
     $canvas: null,
     stage: null,
+    sprite: null,
     renderer: null,
-    graphics: null,
     curves:null,
     resolution: 1,
     defaultWidth: 800,
@@ -17,6 +17,7 @@ var CurveAppView = BaseView.extend({
     gui: null,
     gc: null,
     downloadCount: 0,
+    pixelratio: false,
 
     //----------------------------------------
     // PUBLIC METHODS
@@ -34,21 +35,55 @@ var CurveAppView = BaseView.extend({
         // Grabbing reference to the container
         this.$container = $('#container');
 
+        var context = document.createElement("canvas").getContext("2d");
+        var devicePixelRatio = window.devicePixelRatio || 1;
+        var backingStoreRatio = context.webkitBackingStorePixelRatio ||
+                            context.mozBackingStorePixelRatio ||
+                            context.msBackingStorePixelRatio ||
+                            context.oBackingStorePixelRatio ||
+                            context.backingStorePixelRatio || 1;
+        
+        //this.resolution = devicePixelRatio / backingStoreRatio;
+
         // Initializing pixi renderer
         this.stage = new PIXI.Container();
-        this.renderer = PIXI.autoDetectRenderer(this.defaultWidth, this.defaultHeight, {antialias: true, preserveDrawingBuffer: true});
+        this.renderer = new PIXI.CanvasRenderer(this.defaultWidth * this.resolution, this.defaultHeight * this.resolution, {antialias: true, preserveDrawingBuffer: true});
         this.$container.append(this.renderer.view);
         
         // Grabbing reference to the canvas
         this.$canvas = this.$container.find('canvas');
 
+        //TweenMax.set(this.$canvas, {scale:1/this.resolution});
+        
+        
+
         // Setting the resolution of the canvas
-        this.renderer.resolution = this.resolution;
+        //this.renderer.resolution = this.resolution;
+
         TweenMax.set(this.$canvas, {scale:1/this.resolution});
 
+        /*
+        if(devicePixelRatio !== backingStoreRatio)
+        {
+            var oldWidth = this.renderer.view.width;
+            var oldHeight = this.renderer.view.height;
+
+            this.renderer.view.width = oldWidth * ratio;
+            this.renderer.view.height = oldHeight * ratio;
+
+            this.renderer.view.style.width = oldWidth + 'px';
+            this.renderer.view.style.height = oldHeight + 'px';
+
+            this.context.scale(ratio, ratio);
+        }
+        */
+
         // Creating the Curves
-        this.curves = new Curves({stage: this.stage, curveCount: 8, width: this.defaultWidth, height: this.defaultHeight});
+        this.curves = new Curves({curveCount: 8, width: this.defaultWidth * this.resolution, height: this.defaultHeight * this.resolution});
         this.curves.init();
+
+        // Adding graphic to stage
+        this.stage.addChild(this.curves.graphics);
 
         this.stats = new Stats();
         this.stats.setMode( 2 );
@@ -219,17 +254,15 @@ var CurveAppView = BaseView.extend({
                 this.curves.incrementColor(-1);
                 break;
             case 37: //Left Arrow
-                //
+                //this.curves.shiftColors(-1);
                 break;
             case 39: //Right Arrow
-                //
+                //this.curves.shiftColors(1);
                 break;
             default:
                 break;
         }
     },
-
-
 
     onUpdate: function(delta, time)
     {
@@ -244,10 +277,12 @@ var CurveAppView = BaseView.extend({
         this.width = window.innerWidth;
         this.height = window.innerHeight;
 
-        this.curves.resize(this.width, this.height);
+        this.curves.resize(this.width * this.resolution, this.height * this.resolution);
 
         if(this.gc.canvas.properties.fullscreen.fullscreen)
-            this.renderer.resize(this.width, this.height);
+        {
+            this.renderer.resize(this.width * this.resolution, this.height * this.resolution);
+        }
     },
 
     //----------------------------------------
@@ -267,13 +302,13 @@ var CurveAppView = BaseView.extend({
 
         if(props.fullscreen.fullscreen)
         {
-            this.renderer.resize(this.width, this.height);
-            this.curves.resize(this.width, this.height);
+            this.renderer.resize(this.width * this.resolution, this.height * this.resolution);
+            this.curves.resize(this.width * this.resolution, this.height * this.resolution);
         }
          else
         {
-            var w = props.width.width;
-            var h = props.height.height;
+            var w = props.width.width * this.resolution;
+            var h = props.height.height * this.resolution;
             this.renderer.resize(w, h);
             this.curves.resize(w, h);
         }

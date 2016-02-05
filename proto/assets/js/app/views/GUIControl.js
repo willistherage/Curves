@@ -150,7 +150,7 @@ var GUIControl = function() {
 			name: "Debug",
 			folder: null,
 			properties: {
-				showFPS: {type: 'bool', showFPS: false, control: null},
+				showFPS: {type: 'bool', showFPS: true, control: null},
 				showWave: {type: 'bool', showWave: false, control: null},
 				showBezier: {type: 'bool', showBezier: false, control: null}
 			}

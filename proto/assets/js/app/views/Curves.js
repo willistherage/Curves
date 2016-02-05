@@ -4,7 +4,6 @@ var Curves = BaseView.extend({
     // VARIABLES
     //----------------------------------------
 
-    stage: null,
     graphics: null,
     curveCount: 8,
     pointCount: 6,
@@ -40,14 +39,11 @@ var Curves = BaseView.extend({
 
         this.addListeners();
 
-        this.stage = this.options.stage;
         this.curveCount = this.options.curveCount;
         this.winWidth = this.options.width;
         this.winHeight = this.options.height;
 
         this.graphics = new PIXI.Graphics();
-
-        this.stage.addChild(this.graphics);
         
         this.colors = new Colors();
 
@@ -132,6 +128,14 @@ var Curves = BaseView.extend({
         var length = this.colors.colorList.length-1;
 
         this.colors.shift(MathUtils.loopIndex(0, length, index));
+    },
+
+    incrementColor: function(incr)
+    {
+        var length = this.colors.colorList.length-1;
+        var target = this.colors.colorIndex + incr;
+
+        this.colors.shift(MathUtils.loopIndex(0, length, target));
     },
 
     incrementColor: function(incr)

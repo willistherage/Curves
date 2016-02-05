@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Spotify Curves</title>
+
+	<!-- Core -->
+	<script type="text/javascript" src="assets/js/core/jquery-2.2.0.min.js"></script>
+	<script type="text/javascript" src="assets/js/core/underscore.min.js"></script>
+	<script type="text/javascript" src="assets/js/core/backbone.min.js"></script>
+
+	<!-- Utils -->
+	<script type="text/javascript" src="assets/js/utils/animationframe.js"></script>
+	<script type="text/javascript" src="assets/js/utils/spring.js"></script>
+	<script type="text/javascript" src="assets/js/utils/mathutils.js"></script>
+	<script type='text/javascript' src='assets/js/utils/greensock/TweenMax.min.js'></script>
+	<script type="text/javascript" src="assets/js/utils/pixi.js"></script>
+	<script type="text/javascript" src="assets/js/utils/stats.min.js"></script>
+	<script type="text/javascript" src="assets/js/utils/dat.gui.min.js"></script>
+
+	<!-- App -->
+	<script type="text/javascript" src="assets/js/app/views/BaseView.js"></script>
+	<script type="text/javascript" src="assets/js/app/views/GUIControl.js"></script>
+	<script type="text/javascript" src="assets/js/app/views/Color.js"></script>
+	<script type="text/javascript" src="assets/js/app/views/Colors.js"></script>
+	<script type="text/javascript" src="assets/js/app/views/Point.js"></script>
+	<script type="text/javascript" src="assets/js/app/views/PointGroup.js"></script>
+	<script type="text/javascript" src="assets/js/app/views/Curve.js"></script>
+	<script type="text/javascript" src="assets/js/app/views/Curves.js"></script>
+	<script type="text/javascript" src="assets/js/app/views/AppView.js"></script>
+
+	<!-- Main -->
+	<!--script type="text/javascript" src="assets/js/app/main.js"></script>-->
+</head>
+<body>
+	<div id="container">
+		<canvas id="canvas" width="800" height="600"></canvas>
+	</div>
+
+	<script type="text/javascript">
+
+		$(function() {
+
+			var canvas = document.getElementById("canvas");
+			var ctx = canvas.getContext("webgl");
+
+			console.log(ctx);
+			return;
+
+			var devicePixelRatio = window.devicePixelRatio || 1;
+        	var backingStoreRatio = ctx.webkitBackingStorePixelRatio ||
+                            		ctx.mozBackingStorePixelRatio ||
+                            		ctx.msBackingStorePixelRatio ||
+                            		ctx.oBackingStorePixelRatio ||
+                            		ctx.backingStorePixelRatio || 1;
+
+        	var ratio = devicePixelRatio / backingStoreRatio;
+
+        	if (devicePixelRatio !== backingStoreRatio) {
+
+		        var oldWidth = canvas.width;
+		        var oldHeight = canvas.height;
+
+		        canvas.width = oldWidth * ratio;
+		        canvas.height = oldHeight * ratio;
+
+		        canvas.style.width = oldWidth + 'px';
+		        canvas.style.height = oldHeight + 'px';
+
+		        // now scale the context to counter
+		        // the fact that we've manually scaled
+		        // our canvas element
+		        ctx.scale(ratio, ratio);
+
+		    }
+
+			ctx.lineWidth = 1;
+			ctx.strokeStyle = "#333";
+			ctx.beginPath();
+			ctx.moveTo(100, 250);
+			ctx.bezierCurveTo(150, 100, 350, 100, 400, 250);
+			ctx.stroke();
+		});
+	
+	</script>
+</body>
+</html>
